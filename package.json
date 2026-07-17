@@ -1,0 +1,20 @@
+{
+  "name": "sound-downloader-bot",
+  "version": "1.0.0",
+  "description": "Roblox asset linklerini otomatik algılayıp indiren ve arşivleyen Discord botu",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "deploy-commands": "node src/deployCommands.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.15.3",
+    "axios": "^1.7.4",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

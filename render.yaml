@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: sound-downloader-bot
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: DISCORD_TOKEN
+        sync: false
+      - key: CLIENT_ID
+        sync: false
+      - key: GUILD_ID
+        sync: false
+      - key: DOWNLOAD_DIR
+        value: ./downloads
+      - key: AUTO_DETECT
+        value: "true"
+      - key: ENABLE_HEALTH_SERVER
+        value: "true"
