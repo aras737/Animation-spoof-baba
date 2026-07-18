@@ -5,12 +5,15 @@ const {
   Partials,
   AttachmentBuilder,
   EmbedBuilder,
+  REST,
+  Routes,
 } = require('discord.js');
 
 const { extractAssetIds } = require('./src/detectLinks');
 const { getAssetDetails, downloadAssetBuffer } = require('./src/robloxApi');
 const { saveAsset, readIndex } = require('./src/archive');
 const { startHealthServer } = require('./src/healthServer');
+const { commands } = require('./src/commands');
 
 const AUTO_DETECT = (process.env.AUTO_DETECT || 'true').toLowerCase() !== 'false';
 const ENABLE_HEALTH_SERVER = (process.env.ENABLE_HEALTH_SERVER || 'true').toLowerCase() !== 'false';
@@ -25,9 +28,26 @@ const client = new Client({
   partials: [Partials.Channel],
 });
 
-client.once('ready', () => {
+client.once('ready', async () => {
   console.log(`✅ Giriş yapıldı: ${client.user.tag}`);
   console.log(`   Otomatik link algılama: ${AUTO_DETECT ? 'AÇIK' : 'KAPALI'}`);
+
+  // Slash komutlarını her başlangıçta otomatik kaydet (shell'e gerek kalmasın)
+  try {
+    const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
+    const clientId = process.env.CLIENT_ID || client.user.id;
+    const guildId = process.env.GUILD_ID;
+
+    if (guildId) {
+      await rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands });
+      console.log(`🔧 Slash komutları '${guildId}' sunucusuna kaydedildi (anında aktif).`);
+    } else {
+      await rest.put(Routes.applicationCommands(clientId), { body: commands });
+      console.log('🔧 Slash komutları global olarak kaydedildi (yayılması ~1 saat sürebilir).');
+    }
+  } catch (err) {
+    console.error('⚠️ Slash komutları kaydedilemedi:', err.message);
+  }
 
   if (ENABLE_HEALTH_SERVER) {
     startHealthServer(client);
